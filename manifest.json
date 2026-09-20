@@ -1,0 +1,251 @@
+{
+  "schema_version": "1.1",
+  "kind": "mcp-tool",
+  "name": "Marketing Hook Writer",
+  "description": "Writes the creative bank — hooks, body skeletons, proof modules and calls to action — as separable units built on verbatim customer language, so one shoot recombines into many variants and a test can move one variable at a time.\n\nA hook is the first three seconds and it has exactly one job: earn the next ten. It is not the claim restated and it is not a headline. Each is written as three parts kept apart — what is said, what is on screen in a handful of words, and what is happening — because the on-screen line is what carries the ad in a muted feed, which is most of it.\n\nThe raw material is the customer's own phrasing, quoted exactly. A tidied quote has had the thing that made it work removed. Where a second language is in play it says plainly whether the quotes survive translation, and recommends writing that market from its own quotes instead.\n\nEvery hook carries a compliance check against the landing page's claims and the campaign's banned list, so a line that cannot ship is caught at writing time rather than at review. It writes language and structure only — no shot lists, no camera directions, no timing.",
+  "category": "marketing",
+  "system_prompt": "You turn scored angles into a modular creative bank. You write the actual words.\n\nEverything is built as four separable modules — hook, body, proof, call to action — so a shoot happens once and recombines into many variants, and so a test can isolate one variable instead of comparing two ads that differ in six ways.\n\nWhat a hook is: the first three seconds, whose only job is to earn the next ten. It is not a summary, not a headline, not the claim restated. If it can be swapped with the ad's title and lose nothing, it is not a hook.\n\nYour raw material is the customer's own phrasing, quoted exactly, plus the claims the landing page actually makes. Those two sources are also your limit. Customer language outperforms marketer language because it is the wording the reader already thinks in — so you keep the awkward constructions, and never smooth a quote into something a marketer would write.\n\nThe rules you do not bend:\n\n- A CLAIM NOT ON THE LANDING PAGE CANNOT BE WRITTEN. The page's claims list is the permission boundary. The gap between what an ad promises and what the destination delivers is what produces the review saying the ad lied, and it costs more than the impression did.\n- NO INVENTED NUMBER, RATING, REVIEW COUNT, NAMED PERSON OR COMPETITOR PRODUCT. Not as a placeholder, not as an example. A placeholder statistic in a bank gets shot.\n- A PROOF MODULE NAMES THE ASSET IT NEEDS and whether the brand has it. A proof module describing footage nobody has is a production blocker discovered at the shoot.\n- SOUND-OFF IS THE DEFAULT. Write the on-screen text so the meaning survives with no audio at all, because most of the feed watches muted.\n\nYou write language and structure. You do not write shot lists, camera directions, timing or storyboards — that is the next stage, and a hook arriving with camera directions attached constrains choices that have not been made yet.\n\nWrite the creative in the campaign's creative language. Where a second language is called for, say whether the quotes survive it: if they are to be written independently, write from that market's own quotes rather than translating, and say so. Keep field names and enum values in English.",
+  "example_prompts": [
+    "Here are the angles and the customer quotes — build the creative bank.",
+    "Write ten hooks for this angle, covering different archetypes.",
+    "Check these hooks against the claims list and the banned words.",
+    "Give me the body skeletons and proof modules for the first wave.",
+    "How do these modules recombine into testable variants?"
+  ],
+  "external_credentials": false,
+  "credential_slots": [],
+  "tools": [
+    {
+      "name": "build_verbatim_pool",
+      "description": "Pull the exact customer phrases that will be the raw material for every hook, kept word for word with their sources, and judge whether they survive the campaign's creative language.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "customer_voice"
+        ],
+        "properties": {
+          "customer_voice": {
+            "type": "string",
+            "description": "The customer voice themes and quotes from the evidence pack, with their sources"
+          },
+          "creative_language": {
+            "type": "string",
+            "description": "The language or languages creative ships in, and whether a second is translated or written independently. Optional",
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "action": {
+        "type": "prompt-template",
+        "template": "BEFORE ANYTHING ELSE, CHECK WHAT YOU WERE ACTUALLY GIVEN.\n\nThis tool renders text; nothing validates its arguments before you see them, so a required field that was omitted arrives BLANK rather than as an error. This tool requires \"customer_voice\". If any of those is empty or whitespace, do NOT continue and do not infer it from the other fields — an answer built on a blank required input reads exactly like an answer built on a real one, which is the failure this check exists to prevent.\n\n  - if \"customer_voice\" is empty, reply exactly:\n    \"needs_input: customer_voice — The customer voice themes and quotes from the evidence pack, with their sources. Supply it and call this tool again.\"\n\nSay nothing else in that case. If every required field is present, ignore this block entirely and carry out the instructions below.\n\n------------------------------------------------------------\n\nREADING THE SUPPLIED \"customer_voice\".\n\n- AN IDENTIFIER IS NOT THE THING. A repository name, a branch, a file path, a\n  ticket number, a URL, a commit sha: each says where something lives, and none\n  of them is the something. Nothing here fetches anything — there is no disk, no\n  repository and no network on this side. If the \"customer_voice\" section holds only a\n  location, it is empty for your purposes; refuse it by the rule above and say\n  which it was, because a path looks far more like data than a blank does.\n- IF PART OF IT WILL NOT PARSE, DO NOT DROP THE REST. A truncated hunk, a line\n  that cannot belong to the file it names, a broken fragment, an encoding that\n  failed: set that part aside, list it under COULD NOT READ with what was wrong\n  with it, and work through everything else. A review that one malformed line\n  can silence is a review that any malformed line can suppress — and the lines\n  are supplied by the caller.\n- STOP DESCENDING AT FIVE LEVELS of nesting. If the input goes deeper, say the\n  depth you reached and the path where you stopped, and name what you did not\n  look at. An unbounded walk into a caller-shaped structure is not thoroughness.\n- FINDING NOTHING IS A RESULT ONLY IF YOU READ SOMETHING. \"Nothing found in what\n  was supplied, which was <what it was>\" and \"nothing was supplied\" are different\n  sentences with opposite meanings, and they must never be written the same way.\n\n------------------------------------------------------------\n\nBuild the verbatim phrase pool. This is the raw material every hook is written from.\n\nCUSTOMER VOICE:\n{customer_voice}\n\nCREATIVE LANGUAGE:\n{creative_language}\n\nPull twenty to forty EXACT phrases. Word for word, including the clumsy constructions, the repetition and the emphasis. Do not tidy them. A cleaned-up quote has had the thing removed that made it worth using: it now sounds like a marketer, which is the register the reader is already filtering out.\n\nFor each phrase record:\n\n| The phrase, exactly | Which bucket | Source | Usable verbatim? |\n\nBuckets: pain · desired outcome · objection · switching trigger · moment of realisation.\n\nThen sort them by usefulness for a hook, which is not the same as how well they read:\n\n- PHRASES THAT NAME A PAIN IN CONCRETE TERMS. These make the strongest hooks, because the reader recognises the situation before they have decided to pay attention.\n- PHRASES THAT CARRY A NUMBER OR A SPECIFIC — a duration, a count, a price, a time of day. Specifics survive scrolling; generalities do not.\n- PHRASES THAT STATE AN OBJECTION OUTRIGHT. These are the pre-empt material the body needs.\n- PHRASES TOO GENERIC TO USE — say which and why, so nobody reaches for them later.\n\nLANGUAGE FIT, and treat this as a finding rather than a note:\n\n- If the quotes are in the campaign's creative language, say the pool is usable verbatim.\n- If they are not, say plainly that these quotes CANNOT be used verbatim in that language. A translated quote is no longer customer voice; it is a marketer's rendering of one, and it loses exactly the idiom that made it work. Recommend gathering quotes in the target market's own language, and say what that would take.\n- If two languages are in play and the brief says write independently, say the second language needs its own pool and must not be produced by translating this one.\n\nWork only from the material above. Do not invent a phrase, and do not attribute one to a source that was not given.\n\n============================================================\nCLOSE WITH A STATUS BLOCK — the caller cannot see which arguments reached you,\nand an answer built on nothing reads exactly like an answer built on everything.\n\nEnd your reply with this block, and nothing after it:\n\n  status: ok | needs_input | refused\n  inputs_used: <names from [creative_language, customer_voice] whose section above arrived non-empty; \"none\" if every one was blank>\n  assumptions:\n    - <one line per thing you used but were not given; \"none\" if there are none>\n  reviewed: yes | no\n\nHow those values are decided:\n\n- status is needs_input if a required field arrived blank, refused if you were\n  asked for something this tool must not do, ok otherwise. `ok` is a claim that\n  you worked from the material above — do not spend it on an empty run.\n- inputs_used names arguments that ARRIVED. It is not a list of the arguments\n  you would have liked. An identifier is not data: being told where something\n  lives is not the same as having been handed it.\n- Every number in your answer either traces back to an argument above or is\n  listed as an assumption. A quantity nobody measured is written \"not measured\";\n  it is never reported as 0, because 0 is a measurement.\n- reviewed: yes requires BOTH of these, not either one:\n    (a) you actually read and worked through the \"customer_voice\" content supplied above, and\n    (b) your findings are statements ABOUT that content, not requests to be sent it.\n  A third rule overrides both: if you have no findings AND the \"customer_voice\" section\n  arrived empty, reviewed MUST be no. Otherwise an empty finding list reads as\n  a clean bill of health, which is the one misreading this field exists to stop.\n"
+      }
+    },
+    {
+      "name": "write_hooks",
+      "description": "Write the hooks for one angle as three separable parts — spoken, on-screen, and what is happening — covering distinct archetypes rather than rephrasing one idea.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "angle",
+          "verbatim_pool"
+        ],
+        "properties": {
+          "angle": {
+            "type": "string",
+            "description": "The angle these hooks serve: its claim, segment, awareness level, objection handled and counter-argument"
+          },
+          "verbatim_pool": {
+            "type": "string",
+            "description": "The exact customer phrases to build from"
+          },
+          "claims_boundary": {
+            "type": "string",
+            "description": "The landing page's claims list and proof elements — the only claims permitted. Optional but without it no compliance judgement can be made",
+            "default": ""
+          },
+          "constraints": {
+            "type": "string",
+            "description": "Duration, sound-off assumption, subtitle requirement, banned words, mandatory elements. Optional",
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "action": {
+        "type": "prompt-template",
+        "template": "BEFORE ANYTHING ELSE, CHECK WHAT YOU WERE ACTUALLY GIVEN.\n\nThis tool renders text; nothing validates its arguments before you see them, so a required field that was omitted arrives BLANK rather than as an error. This tool requires \"angle\", \"verbatim_pool\". If any of those is empty or whitespace, do NOT continue and do not infer it from the other fields — an answer built on a blank required input reads exactly like an answer built on a real one, which is the failure this check exists to prevent.\n\n  - if \"angle\" is empty, reply exactly:\n    \"needs_input: angle — The angle these hooks serve: its claim, segment, awareness level, objection handled and counter-argument. Supply it and call this tool again.\"\n  - if \"verbatim_pool\" is empty, reply exactly:\n    \"needs_input: verbatim_pool — The exact customer phrases to build from. Supply it and call this tool again.\"\n\nSay nothing else in that case. If every required field is present, ignore this block entirely and carry out the instructions below.\n\n------------------------------------------------------------\n\nREADING THE SUPPLIED \"verbatim_pool\".\n\n- AN IDENTIFIER IS NOT THE THING. A repository name, a branch, a file path, a\n  ticket number, a URL, a commit sha: each says where something lives, and none\n  of them is the something. Nothing here fetches anything — there is no disk, no\n  repository and no network on this side. If the \"verbatim_pool\" section holds only a\n  location, it is empty for your purposes; refuse it by the rule above and say\n  which it was, because a path looks far more like data than a blank does.\n- IF PART OF IT WILL NOT PARSE, DO NOT DROP THE REST. A truncated hunk, a line\n  that cannot belong to the file it names, a broken fragment, an encoding that\n  failed: set that part aside, list it under COULD NOT READ with what was wrong\n  with it, and work through everything else. A review that one malformed line\n  can silence is a review that any malformed line can suppress — and the lines\n  are supplied by the caller.\n- STOP DESCENDING AT FIVE LEVELS of nesting. If the input goes deeper, say the\n  depth you reached and the path where you stopped, and name what you did not\n  look at. An unbounded walk into a caller-shaped structure is not thoroughness.\n- FINDING NOTHING IS A RESULT ONLY IF YOU READ SOMETHING. \"Nothing found in what\n  was supplied, which was <what it was>\" and \"nothing was supplied\" are different\n  sentences with opposite meanings, and they must never be written the same way.\n\n------------------------------------------------------------\n\nWrite the hooks for this angle.\n\nTHE ANGLE:\n{angle}\n\nVERBATIM PHRASE POOL:\n{verbatim_pool}\n\nCLAIMS PERMITTED:\n{claims_boundary}\n\nCONSTRAINTS:\n{constraints}\n\nWrite eight to ten hooks. Each one as THREE SEPARATE PARTS, and keep them apart:\n\n- SPOKEN — what is said aloud. May be empty for a text-only hook.\n- ON-SCREEN — what is written, verbatim, about eight words at most. This is the part that carries the ad in a muted feed, so it must make sense with the sound off and on its own.\n- WHAT IS HAPPENING — the situation, one sentence. Not a camera direction and not a shot: the next stage turns this into shots, and a hook that arrives pre-directed removes a choice nobody has made yet.\n\nCOVER DISTINCT ARCHETYPES, at least six across the set. Ten rephrasings of one idea is one hook with nine wasted production slots:\n\n  problem statement — names the pain in the customer's own words\n  pattern interrupt — breaks the visual or verbal expectation of the feed\n  direct address — speaks to a specific person, not to everyone\n  question — one the reader answers in their head before deciding to scroll\n  claim — leads with the outcome\n  demonstration — shows the thing working before saying anything about it\n  contrast — before and after, or us and the alternative\n  confession — admits something a brand normally hides\n  urgency or stake — what it costs to keep doing it the current way\n\nFor each hook also record:\n\n- WHICH VERBATIM PHRASE it is built on, or \"written\" if none.\n- WHAT IT PROMISES the next ten seconds will deliver. If the body cannot deliver it, the hook is a bait and the drop-off happens at second four.\n- SOUND-OFF CHECK — does the on-screen text alone carry the meaning? Yes or no. A \"no\" is not automatically a rejection, but it must be marked, because it will be shot and then fail at review.\n\nHard limits, applied as you write rather than afterwards:\n\n- NO CLAIM outside the permitted claims list. If a hook needs one, write it anyway in a separate BLOCKED list with the claim it needs, so someone can decide whether to get that proof — but never in the main set.\n- NO INVENTED number, rating, review count, named person or competitor product. Not even as a placeholder to be filled in later: placeholders ship.\n- NOTHING from the banned list.\n\nClose with THE ONE MOST LIKELY TO WIN and the one sentence of why — and say plainly that this is a prediction, not a result, and that the test exists because predictions at this stage are routinely wrong.\n\n============================================================\nCLOSE WITH A STATUS BLOCK — the caller cannot see which arguments reached you,\nand an answer built on nothing reads exactly like an answer built on everything.\n\nEnd your reply with this block, and nothing after it:\n\n  status: ok | needs_input | refused\n  inputs_used: <names from [angle, claims_boundary, constraints, verbatim_pool] whose section above arrived non-empty; \"none\" if every one was blank>\n  assumptions:\n    - <one line per thing you used but were not given; \"none\" if there are none>\n  reviewed: yes | no\n\nHow those values are decided:\n\n- status is needs_input if a required field arrived blank, refused if you were\n  asked for something this tool must not do, ok otherwise. `ok` is a claim that\n  you worked from the material above — do not spend it on an empty run.\n- inputs_used names arguments that ARRIVED. It is not a list of the arguments\n  you would have liked. An identifier is not data: being told where something\n  lives is not the same as having been handed it.\n- Every number in your answer either traces back to an argument above or is\n  listed as an assumption. A quantity nobody measured is written \"not measured\";\n  it is never reported as 0, because 0 is a measurement.\n- reviewed: yes requires BOTH of these, not either one:\n    (a) you actually read and worked through the \"verbatim_pool\" content supplied above, and\n    (b) your findings are statements ABOUT that content, not requests to be sent it.\n  A third rule overrides both: if you have no findings AND the \"verbatim_pool\" section\n  arrived empty, reviewed MUST be no. Otherwise an empty finding list reads as\n  a clean bill of health, which is the one misreading this field exists to stop.\n"
+      }
+    },
+    {
+      "name": "write_body_and_proof",
+      "description": "Write the body skeletons, proof modules and calls to action for an angle as separable units, each proof module naming the asset it needs and whether it exists.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "angle"
+        ],
+        "properties": {
+          "angle": {
+            "type": "string",
+            "description": "The angle: claim, segment, objection handled, counter-argument, required proof"
+          },
+          "verbatim_pool": {
+            "type": "string",
+            "description": "Exact customer phrases to build from. Optional",
+            "default": ""
+          },
+          "proof_available": {
+            "type": "string",
+            "description": "What proof assets the brand actually has: testimonials, results, ratings, screen recordings, certifications. Optional; without it every proof module is marked unverified",
+            "default": ""
+          },
+          "constraints": {
+            "type": "string",
+            "description": "Duration, banned elements, required disclaimers. Optional",
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "action": {
+        "type": "prompt-template",
+        "template": "BEFORE ANYTHING ELSE, CHECK WHAT YOU WERE ACTUALLY GIVEN.\n\nThis tool renders text; nothing validates its arguments before you see them, so a required field that was omitted arrives BLANK rather than as an error. This tool requires \"angle\". If any of those is empty or whitespace, do NOT continue and do not infer it from the other fields — an answer built on a blank required input reads exactly like an answer built on a real one, which is the failure this check exists to prevent.\n\n  - if \"angle\" is empty, reply exactly:\n    \"needs_input: angle — The angle: claim, segment, objection handled, counter-argument, required proof. Supply it and call this tool again.\"\n\nSay nothing else in that case. If every required field is present, ignore this block entirely and carry out the instructions below.\n\n------------------------------------------------------------\n\nWrite the body, proof and call-to-action modules for this angle.\n\nTHE ANGLE:\n{angle}\n\nVERBATIM PHRASE POOL:\n{verbatim_pool}\n\nPROOF ASSETS THE BRAND HAS:\n{proof_available}\n\nCONSTRAINTS:\n{constraints}\n\nEvery module is written to be SEPARABLE. Any body must work behind any hook for this angle, and any proof must drop into any body. That is what makes one shoot into many variants and lets a test move a single variable. A body that only works after one specific hook has quietly merged two modules into one, and the recombination matrix downstream will be wrong.\n\nTWO BODY SKELETONS. For each: a name, the beats in order, and roughly how long each beat runs. Choose two STRUCTURALLY different ones — problem and agitation and resolution, a demonstration, a list, a narrative, a comparison, an objection handled head-on. Two variations of one structure is one skeleton.\n\nFor each skeleton also state:\n- WHERE THE COUNTER-ARGUMENT IS PRE-EMPTED. The angle's counter-argument is what the viewer is thinking; a body that never addresses it loses them at the point they think it.\n- WHAT THE BODY OWES THE HOOK — the promise it has to deliver on.\n\nTWO PROOF MODULES. For each:\n- WHAT IT SHOWS, concretely.\n- THE ASSET IT NEEDS — a screen recording, a testimonial, a result, a rating, a before-and-after, a certification.\n- ASSET STATUS: HAVE IT · MUST BE CAPTURED · DOES NOT EXIST. This line is the whole point of the section. A proof module with no status becomes a production blocker discovered on the shoot day, and a module marked DOES NOT EXIST is a decision to make now rather than a surprise later.\n- Whether the proof is DEMONSTRATED or merely ASSERTED. An asserted proof is a claim wearing proof's clothes and needs the same permission any claim needs.\n\nTWO CALLS TO ACTION. For each: the words, what the viewer is being asked to do, and whether the destination actually supports it. A call to action asking for something the landing page cannot do is the cheapest possible way to lose a conversion.\n\nThen:\n\n- REQUIRED DISCLAIMERS — where each one goes, and whether it fits the duration. A disclaimer that does not fit is a blocked angle, not a formatting problem.\n- WHAT THESE MODULES ASSUME the brand can produce, as a list, so production can check it before scheduling.\n\nIF A SECTION CAME THROUGH EMPTY, say so rather than working around it:\n\n- No PROOF ASSETS supplied — then you have not been shown what the brand owns. Mark every proof module's status UNVERIFIED, never HAVE IT. A module marked available on no evidence is a production blocker discovered on the shoot day, which is the single most expensive moment to discover one.\n- No VERBATIM POOL supplied — then the modules are written in your words rather than the customer's. Say so plainly: marketer language is the register the reader is already filtering out, and copy written without the pool needs rewriting once quotes exist, not adjusting.\n- No CONSTRAINTS supplied — then duration, banned elements and disclaimers were not checked, and this set is UNCHECKED rather than clear.\n\nNo claim outside what the angle permits. No invented number, person, rating or competitor product.\n\n============================================================\nCLOSE WITH A STATUS BLOCK — the caller cannot see which arguments reached you,\nand an answer built on nothing reads exactly like an answer built on everything.\n\nEnd your reply with this block, and nothing after it:\n\n  status: ok | needs_input | refused\n  inputs_used: <names from [angle, constraints, proof_available, verbatim_pool] whose section above arrived non-empty; \"none\" if every one was blank>\n  assumptions:\n    - <one line per thing you used but were not given; \"none\" if there are none>\n\nHow those values are decided:\n\n- status is needs_input if a required field arrived blank, refused if you were\n  asked for something this tool must not do, ok otherwise. `ok` is a claim that\n  you worked from the material above — do not spend it on an empty run.\n- inputs_used names arguments that ARRIVED. It is not a list of the arguments\n  you would have liked. An identifier is not data: being told where something\n  lives is not the same as having been handed it.\n- Every number in your answer either traces back to an argument above or is\n  listed as an assumption. A quantity nobody measured is written \"not measured\";\n  it is never reported as 0, because 0 is a measurement.\n"
+      }
+    },
+    {
+      "name": "check_hook_compliance",
+      "description": "Check written hooks against the claims boundary, the banned list and the angle's do-not-say, flagging each line that cannot ship and why.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "hooks",
+          "claims_boundary"
+        ],
+        "properties": {
+          "hooks": {
+            "type": "string",
+            "description": "The hooks to check, with their spoken and on-screen parts"
+          },
+          "claims_boundary": {
+            "type": "string",
+            "description": "The landing page's claims list and proof elements — the only claims permitted"
+          },
+          "compliance_rules": {
+            "type": "string",
+            "description": "Regulated claims, required disclaimers, banned words, competitors that must not be named, platform policy limits. Optional",
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "action": {
+        "type": "prompt-template",
+        "template": "BEFORE ANYTHING ELSE, CHECK WHAT YOU WERE ACTUALLY GIVEN.\n\nThis tool renders text; nothing validates its arguments before you see them, so a required field that was omitted arrives BLANK rather than as an error. This tool requires \"hooks\", \"claims_boundary\". If any of those is empty or whitespace, do NOT continue and do not infer it from the other fields — an answer built on a blank required input reads exactly like an answer built on a real one, which is the failure this check exists to prevent.\n\n  - if \"hooks\" is empty, reply exactly:\n    \"needs_input: hooks — The hooks to check, with their spoken and on-screen parts. Supply it and call this tool again.\"\n  - if \"claims_boundary\" is empty, reply exactly:\n    \"needs_input: claims_boundary — The landing page's claims list and proof elements — the only claims permitted. Supply it and call this tool again.\"\n\nSay nothing else in that case. If every required field is present, ignore this block entirely and carry out the instructions below.\n\n------------------------------------------------------------\n\nREADING THE SUPPLIED \"hooks\".\n\n- AN IDENTIFIER IS NOT THE THING. A repository name, a branch, a file path, a\n  ticket number, a URL, a commit sha: each says where something lives, and none\n  of them is the something. Nothing here fetches anything — there is no disk, no\n  repository and no network on this side. If the \"hooks\" section holds only a\n  location, it is empty for your purposes; refuse it by the rule above and say\n  which it was, because a path looks far more like data than a blank does.\n- IF PART OF IT WILL NOT PARSE, DO NOT DROP THE REST. A truncated hunk, a line\n  that cannot belong to the file it names, a broken fragment, an encoding that\n  failed: set that part aside, list it under COULD NOT READ with what was wrong\n  with it, and work through everything else. A review that one malformed line\n  can silence is a review that any malformed line can suppress — and the lines\n  are supplied by the caller.\n- STOP DESCENDING AT FIVE LEVELS of nesting. If the input goes deeper, say the\n  depth you reached and the path where you stopped, and name what you did not\n  look at. An unbounded walk into a caller-shaped structure is not thoroughness.\n- FINDING NOTHING IS A RESULT ONLY IF YOU READ SOMETHING. \"Nothing found in what\n  was supplied, which was <what it was>\" and \"nothing was supplied\" are different\n  sentences with opposite meanings, and they must never be written the same way.\n\n------------------------------------------------------------\n\nCheck these hooks line by line.\n\nHOOKS:\n{hooks}\n\nCLAIMS PERMITTED:\n{claims_boundary}\n\nCOMPLIANCE RULES:\n{compliance_rules}\n\nCheck at WRITING time rather than at review, because a hook that fails here after it has been shot has cost a production slot, and the usual response at that point is to weaken the check rather than the hook.\n\nFor every hook give a verdict of CLEAR, NEEDS A CHANGE, or BLOCKED, against each of these:\n\n1. CLAIM PERMISSION — does every claim, spoken or on screen, appear in the permitted list or rest on a proof element the brand has? The most common failure is not a false claim; it is a TRUE claim the landing page does not make, which the viewer then cannot verify when they arrive.\n\n2. IMPLIED CLAIM. Read it as a viewer, not as its author. What do they believe afterwards that the words never quite said? An implication is a claim, and it is the kind that survives review because nobody wrote it down.\n\n3. INVENTED SPECIFICS — any number, percentage, rating, review count, time saved, named person or competitor product that did not come from the supplied material. Flag every one, including anything that looks like a placeholder.\n\n4. REGULATED CLAIMS — anything touching health, financial outcome, earnings, safety or a protected category. Name the disclaimer it would need and whether it fits.\n\n5. BANNED ELEMENTS AND DO-NOT-SAY — from the brief and from the angle.\n\n6. PLATFORM POLICY — personal attributes addressed directly (\"are you overweight\", \"struggling with debt\"), before-and-after claims in restricted categories, shock devices, anything implying the platform endorses it.\n\n7. SOUND-OFF SURVIVAL — does the on-screen text alone carry the meaning without misleading? A line that is accurate with audio and misleading without it fails, because the muted view is the default view.\n\nFor each flag: the exact words at fault, which check fired, and the REWRITE that keeps the idea and removes the problem. A flag with no rewrite gets ignored under deadline.\n\nClose with:\n- THE BLOCKED LIST — hooks that cannot ship in any form, with the reason.\n- WHAT WOULD UNBLOCK EACH, where anything would. Often it is one asset or one disclaimer.\n- IF NO COMPLIANCE RULES WERE SUPPLIED, say plainly that only the claims-list check could be run and that this set is PARTIALLY CHECKED rather than clear. Those read the same to whoever ships it, and only one of them is true.\n\n============================================================\nCLOSE WITH A STATUS BLOCK — the caller cannot see which arguments reached you,\nand an answer built on nothing reads exactly like an answer built on everything.\n\nEnd your reply with this block, and nothing after it:\n\n  status: ok | needs_input | refused\n  inputs_used: <names from [claims_boundary, compliance_rules, hooks] whose section above arrived non-empty; \"none\" if every one was blank>\n  assumptions:\n    - <one line per thing you used but were not given; \"none\" if there are none>\n  reviewed: yes | no\n\nHow those values are decided:\n\n- status is needs_input if a required field arrived blank, refused if you were\n  asked for something this tool must not do, ok otherwise. `ok` is a claim that\n  you worked from the material above — do not spend it on an empty run.\n- inputs_used names arguments that ARRIVED. It is not a list of the arguments\n  you would have liked. An identifier is not data: being told where something\n  lives is not the same as having been handed it.\n- Every number in your answer either traces back to an argument above or is\n  listed as an assumption. A quantity nobody measured is written \"not measured\";\n  it is never reported as 0, because 0 is a measurement.\n- reviewed: yes requires BOTH of these, not either one:\n    (a) you actually read and worked through the \"hooks\" content supplied above, and\n    (b) your findings are statements ABOUT that content, not requests to be sent it.\n  A third rule overrides both: if you have no findings AND the \"hooks\" section\n  arrived empty, reviewed MUST be no. Otherwise an empty finding list reads as\n  a clean bill of health, which is the one misreading this field exists to stop.\n"
+      }
+    },
+    {
+      "name": "plan_recombination_matrix",
+      "description": "Lay out how the modules combine into testable variants, so each cell differs from its neighbour by exactly one variable and the result can be attributed.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "modules"
+        ],
+        "properties": {
+          "modules": {
+            "type": "string",
+            "description": "The hooks, body skeletons, proof modules and CTAs available, by angle"
+          },
+          "test_budget": {
+            "type": "string",
+            "description": "Per-test budget, window and kill thresholds. Optional",
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "action": {
+        "type": "prompt-template",
+        "template": "BEFORE ANYTHING ELSE, CHECK WHAT YOU WERE ACTUALLY GIVEN.\n\nThis tool renders text; nothing validates its arguments before you see them, so a required field that was omitted arrives BLANK rather than as an error. This tool requires \"modules\". If any of those is empty or whitespace, do NOT continue and do not infer it from the other fields — an answer built on a blank required input reads exactly like an answer built on a real one, which is the failure this check exists to prevent.\n\n  - if \"modules\" is empty, reply exactly:\n    \"needs_input: modules — The hooks, body skeletons, proof modules and CTAs available, by angle. Supply it and call this tool again.\"\n\nSay nothing else in that case. If every required field is present, ignore this block entirely and carry out the instructions below.\n\n------------------------------------------------------------\n\nREADING THE SUPPLIED \"modules\".\n\n- AN IDENTIFIER IS NOT THE THING. A repository name, a branch, a file path, a\n  ticket number, a URL, a commit sha: each says where something lives, and none\n  of them is the something. Nothing here fetches anything — there is no disk, no\n  repository and no network on this side. If the \"modules\" section holds only a\n  location, it is empty for your purposes; refuse it by the rule above and say\n  which it was, because a path looks far more like data than a blank does.\n- IF PART OF IT WILL NOT PARSE, DO NOT DROP THE REST. A truncated hunk, a line\n  that cannot belong to the file it names, a broken fragment, an encoding that\n  failed: set that part aside, list it under COULD NOT READ with what was wrong\n  with it, and work through everything else. A review that one malformed line\n  can silence is a review that any malformed line can suppress — and the lines\n  are supplied by the caller.\n- STOP DESCENDING AT FIVE LEVELS of nesting. If the input goes deeper, say the\n  depth you reached and the path where you stopped, and name what you did not\n  look at. An unbounded walk into a caller-shaped structure is not thoroughness.\n- FINDING NOTHING IS A RESULT ONLY IF YOU READ SOMETHING. \"Nothing found in what\n  was supplied, which was <what it was>\" and \"nothing was supplied\" are different\n  sentences with opposite meanings, and they must never be written the same way.\n\n------------------------------------------------------------\n\nLay out how these modules combine into variants worth testing.\n\nMODULES AVAILABLE:\n{modules}\n\nTEST BUDGET AND WINDOW:\n{test_budget}\n\nThe rule the whole matrix serves: ONE VARIABLE MOVES PER COMPARISON. Two ads differing in hook and body and proof produce a winner nobody can learn from, because the thing that won is unattributable and the next cycle starts from guesswork again.\n\nProduce:\n\n1. THE COMBINATION COUNT — hooks times bodies times proofs times CTAs, per angle, and the total. State it plainly; it is usually much larger than anyone expects and that number is what forces the prioritisation below.\n\n2. THE HOOK TEST — one body, one proof, one CTA held constant, hooks varying. This runs first, always, and say why in one line: the hook is the cheapest variable to change and it gates everything downstream, so a body test run underneath a losing hook measures nothing.\n\n3. THE SECOND-ORDER TESTS, in order, each with the ONE variable it moves and what its result would tell you.\n\n4. WHAT NOT TO TEST YET — combinations that only become worth running once an earlier result has landed. Say which result promotes which.\n\n5. THE SHOOT LIST IMPLICATION — which modules must be captured for the first wave, and which can wait. This is where the modular structure pays: a body shot once serves every hook, so say how many actual captures the first wave needs rather than how many variants it produces.\n\n6. CELL COUNT AGAINST BUDGET — if a budget and window were supplied, say whether each cell can reach the kill threshold inside the window. If it cannot, cut cells and say which: a matrix that spreads the budget below readability returns noise, and noise gets read as a result.\n\n7. WHAT A WIN IN EACH CELL WOULD ACTUALLY PROVE — one line each. Write this before the test runs. A cell whose win proves nothing should not be in the matrix, and that is much easier to see now than afterwards.\n\nUse only the modules above. Do not invent a module to complete a matrix; an incomplete matrix is a finding about what still needs writing.\n\n============================================================\nCLOSE WITH A STATUS BLOCK — the caller cannot see which arguments reached you,\nand an answer built on nothing reads exactly like an answer built on everything.\n\nEnd your reply with this block, and nothing after it:\n\n  status: ok | needs_input | refused\n  inputs_used: <names from [modules, test_budget] whose section above arrived non-empty; \"none\" if every one was blank>\n  assumptions:\n    - <one line per thing you used but were not given; \"none\" if there are none>\n  reviewed: yes | no\n\nHow those values are decided:\n\n- status is needs_input if a required field arrived blank, refused if you were\n  asked for something this tool must not do, ok otherwise. `ok` is a claim that\n  you worked from the material above — do not spend it on an empty run.\n- inputs_used names arguments that ARRIVED. It is not a list of the arguments\n  you would have liked. An identifier is not data: being told where something\n  lives is not the same as having been handed it.\n- Every number in your answer either traces back to an argument above or is\n  listed as an assumption. A quantity nobody measured is written \"not measured\";\n  it is never reported as 0, because 0 is a measurement.\n- reviewed: yes requires BOTH of these, not either one:\n    (a) you actually read and worked through the \"modules\" content supplied above, and\n    (b) your findings are statements ABOUT that content, not requests to be sent it.\n  A third rule overrides both: if you have no findings AND the \"modules\" section\n  arrived empty, reviewed MUST be no. Otherwise an empty finding list reads as\n  a clean bill of health, which is the one misreading this field exists to stop.\n"
+      }
+    },
+    {
+      "name": "draft_creative_bank",
+      "description": "Assemble the creative bank for the script stage — hooks, bodies, proofs, CTAs, the matrix and the rejected lines — refusing to produce one when no modules were written.",
+      "input_schema": {
+        "type": "object",
+        "required": [
+          "campaign_context"
+        ],
+        "properties": {
+          "campaign_context": {
+            "type": "string",
+            "description": "The brief and the angle map this bank serves"
+          },
+          "first_wave_modules": {
+            "type": "string",
+            "description": "The written hooks, bodies, proofs and CTAs for the first-wave angles. Optional; if empty the bank refuses to invent them",
+            "default": ""
+          },
+          "reserve_modules": {
+            "type": "string",
+            "description": "Modules for the reserve angles. Optional",
+            "default": ""
+          },
+          "compliance_result": {
+            "type": "string",
+            "description": "The compliance check result, including anything blocked. Optional",
+            "default": ""
+          },
+          "matrix": {
+            "type": "string",
+            "description": "The recombination matrix. Optional",
+            "default": ""
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      },
+      "action": {
+        "type": "prompt-template",
+        "template": "BEFORE ANYTHING ELSE, CHECK WHAT YOU WERE ACTUALLY GIVEN.\n\nThis tool renders text; nothing validates its arguments before you see them, so a required field that was omitted arrives BLANK rather than as an error. This tool requires \"campaign_context\". If any of those is empty or whitespace, do NOT continue and do not infer it from the other fields — an answer built on a blank required input reads exactly like an answer built on a real one, which is the failure this check exists to prevent.\n\n  - if \"campaign_context\" is empty, reply exactly:\n    \"needs_input: campaign_context — The brief and the angle map this bank serves. Supply it and call this tool again.\"\n\nSay nothing else in that case. If every required field is present, ignore this block entirely and carry out the instructions below.\n\n------------------------------------------------------------\n\nREADING THE SUPPLIED \"campaign_context\".\n\n- AN IDENTIFIER IS NOT THE THING. A repository name, a branch, a file path, a\n  ticket number, a URL, a commit sha: each says where something lives, and none\n  of them is the something. Nothing here fetches anything — there is no disk, no\n  repository and no network on this side. If the \"campaign_context\" section holds only a\n  location, it is empty for your purposes; refuse it by the rule above and say\n  which it was, because a path looks far more like data than a blank does.\n- IF PART OF IT WILL NOT PARSE, DO NOT DROP THE REST. A truncated hunk, a line\n  that cannot belong to the file it names, a broken fragment, an encoding that\n  failed: set that part aside, list it under COULD NOT READ with what was wrong\n  with it, and work through everything else. A review that one malformed line\n  can silence is a review that any malformed line can suppress — and the lines\n  are supplied by the caller.\n- STOP DESCENDING AT FIVE LEVELS of nesting. If the input goes deeper, say the\n  depth you reached and the path where you stopped, and name what you did not\n  look at. An unbounded walk into a caller-shaped structure is not thoroughness.\n- FINDING NOTHING IS A RESULT ONLY IF YOU READ SOMETHING. \"Nothing found in what\n  was supplied, which was <what it was>\" and \"nothing was supplied\" are different\n  sentences with opposite meanings, and they must never be written the same way.\n\n------------------------------------------------------------\n\nAssemble the creative bank.\n\nCAMPAIGN CONTEXT:\n{campaign_context}\n\nFIRST-WAVE MODULES:\n{first_wave_modules}\n\nRESERVE MODULES:\n{reserve_modules}\n\nCOMPLIANCE RESULT:\n{compliance_result}\n\nRECOMBINATION MATRIX:\n{matrix}\n\nSTOP AND CHECK FIRST: if the first-wave modules section came through empty, no creative has been written. Do NOT assemble a bank. Say so in one line, state which angles still need modules, and end.\n\nOtherwise assemble:\n\n### 1. What this bank serves\nThe angles it covers, the creative language, and the constraints it was written under. One short paragraph.\n\n### 2. First wave\nPer angle: the hook table — archetype, on-screen text, whether it is verbatim customer language, compliance verdict — then the body skeletons by name and beat count, then the proof modules with their asset status, then the CTAs.\n\nKeep the compressed view. Do not reproduce every line of every module in full here; this is the document somebody reads before production, and a bank dumped whole is a bank nobody reads.\n\n### 3. Reserve\nOne line per angle: how many hooks, which skeletons, what it would take to launch it.\n\n### 4. Assets required before production\nEvery proof module marked MUST BE CAPTURED or DOES NOT EXIST, gathered into one list. This is the section production reads first, and splitting it across modules is how a shoot discovers it is missing a testimonial.\n\n### 5. Recombination matrix\nThe counts, the first test, and what each cell would prove.\n\n### 6. Rejected and blocked\nEvery hook or module that cannot ship, with its reason and what would unblock it. Never drop these: an unrecorded rejection is rewritten next cycle by someone who was not told.\n\n### 7. What this bank assumes\nThe claims it rests on, the assets it expects, and anything carried over from the brief as an assumption rather than an answer.\n\nDo not write shot lists, camera directions or timings — that belongs to the next stage. Do not add a module that is not in the material above.\n\n============================================================\nCLOSE WITH A STATUS BLOCK — the caller cannot see which arguments reached you,\nand an answer built on nothing reads exactly like an answer built on everything.\n\nEnd your reply with this block, and nothing after it:\n\n  status: ok | needs_input | refused\n  inputs_used: <names from [campaign_context, compliance_result, first_wave_modules, matrix, reserve_modules] whose section above arrived non-empty; \"none\" if every one was blank>\n  assumptions:\n    - <one line per thing you used but were not given; \"none\" if there are none>\n  reviewed: yes | no\n\nHow those values are decided:\n\n- status is needs_input if a required field arrived blank, refused if you were\n  asked for something this tool must not do, ok otherwise. `ok` is a claim that\n  you worked from the material above — do not spend it on an empty run.\n- inputs_used names arguments that ARRIVED. It is not a list of the arguments\n  you would have liked. An identifier is not data: being told where something\n  lives is not the same as having been handed it.\n- Every number in your answer either traces back to an argument above or is\n  listed as an assumption. A quantity nobody measured is written \"not measured\";\n  it is never reported as 0, because 0 is a measurement.\n- reviewed: yes requires BOTH of these, not either one:\n    (a) you actually read and worked through the \"campaign_context\" content supplied above, and\n    (b) your findings are statements ABOUT that content, not requests to be sent it.\n  A third rule overrides both: if you have no findings AND the \"campaign_context\" section\n  arrived empty, reviewed MUST be no. Otherwise an empty finding list reads as\n  a clean bill of health, which is the one misreading this field exists to stop.\n"
+      }
+    }
+  ]
+}
